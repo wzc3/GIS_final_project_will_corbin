@@ -21,17 +21,7 @@ prefer-html: true
 
 ## Introduction
 
-Several previous studies have found robust relationships between spatial properties of a country's **capital city** and that country's propensity for **conflict** and **misgovernance**.
-
-Perceptions of this linkage also have an effect on "coup-proofing" decisions made by national governments. A recent BBC interview with Equatorial Guinea's President Teodoro Obiang, for example, highlighted this as a factor behind his decision to relocate the capital city:
-
-> It's the remoteness of Oyala that makes it so appealing to President Obiang. In a rare interview he described how rebels had recently plotted a seaborne assault on his palace in the current capital, Malabo. 'We need a secure place for my government and for future governments. That's why we have created Oyala, to guarantee the government of Equatorial Guinea.' [@sackur_equatorial_2012]
-
-This case is far from exceptional, as an even more recent *Washington Post* article points out with respect to Myanmar's decision to move its capital from Yangon to Naypyidaw:
-
-> Analysts have described the decision as motivated by a desire to secure the military’s seat of power from any threat of protests or invasions. [@berger_myanmars_2021]
-
-Most of these studies, however, are based on observations of **conflict events**. In this study, we study the more fundamental variable of a capital's distance from the **population centroid** of the country.
+The US Civil War was one of the first wars that attempted to leverage the use of railroads. Controlling railroad locations and having easy access contributed to the Union's ability to win the war, especially becuase most battles 
 
 ## Literature Review
 
