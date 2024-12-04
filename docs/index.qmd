@@ -7,7 +7,6 @@ authors:
     affiliation: Georgetown University
     corresponding: true
 df-print: kable
-bibliography: GIS_Manuscript.bib
 title-block-banner: "#E69F0095"
 title-block-banner-color: "black"
 format:
@@ -72,10 +71,6 @@ battle_df |> head()
 
 ```
 
-```{r}
-battle_df$significance_numeric
-
-```
 
 ```{r}
 #| label: map battle data
@@ -88,19 +83,6 @@ mapview(battle_sf,zcol="result", cex="significance_numeric", label="result")
 ```
 
 
-We then construct an **area-normalized** measure of capital-centroid distance $\text{dist}^{\textsf{AN}}$, using the formula
-
-$$
-\text{dist}^{\textsf{AN}}_i = \text{dist}_i / \sqrt{\text{area}_i}.
-$$
-
-A plot of this measure by country looks as follows:
-
-```{r}
-#| label: plot-area
-merged_area_sf <- readRDS("merged_area_sf.rds")
-mapview(merged_area_sf, zcol="scaled_dist")
-```
 
 ## Hypothesis Testing (Regression)
 
