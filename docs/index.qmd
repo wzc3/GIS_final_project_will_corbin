@@ -7,7 +7,7 @@ authors:
     affiliation: Georgetown University
     corresponding: true
 df-print: kable
-title-block-banner: "#E69F0095"
+title-block-banner: "#964B00"
 title-block-banner-color: "black"
 format:
   html:
@@ -20,7 +20,22 @@ prefer-html: true
 
 ## Introduction
 
-The US Civil War was one of the first wars that attempted to leverage the use of railroads. Controlling railroad locations and having easy access contributed to the Union's ability to win the war, especially becuase most battles 
+The US Civil War was one of the first wars that attempted to leverage the use of railroads. Controlling railroad locations and having easy access contributed to the Union's ability to win the war, especially because most battles took place in the US South. Railroads are able to be utilized to transport troops and supplies, and by doing so provide crucial support for an army that is not on its home soil.
+
+The question I would like to explore:
+Is the Union more likely to win battles that are located in close proximity to railroad junctions?
+
+## Roadmap
+
+- Determine where the railroad junctions are located (specifically in the US South). 
+- Determine where Civil War battles took place.
+- Analyze distances from battle sites to railroad junctions.
+- Compare intensity functions of railroad junctions and battle sites.
+- Run an experiment that randomizes some element of battle sites location or railroad junction locations.
+- Examine possible spatial effect of railroad junctions on the results of battles, specifically battles that resulted in an Union victory.
+- Is there anything we can test regarding the significance of the battle?
+
+
 
 ## Literature Review
 
@@ -84,7 +99,7 @@ mapview(battle_sf,zcol="result", cex="significance_numeric", label="result")
 
 
 
-## Hypothesis Testing (Regression)
+## Hypothesis Testing
 
 
 ## Discussion
