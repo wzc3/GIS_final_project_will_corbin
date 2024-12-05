@@ -92,9 +92,18 @@ battle_df |> head()
 
 ```
 
+```{r}
+#| label: map battle data 
+battle_sf <- battle_df |> sf::st_as_sf(
+  coords=c("long","lat"),
+  crs=4326
+) |> sf::st_transform(3857)
+mapview(battle_sf,zcol="result", label="result")
+
+```
 
 ```{r}
-#| label: map battle data
+#| label: map battle data with significance
 battle_sf <- battle_df |> sf::st_as_sf(
   coords=c("long","lat"),
   crs=4326
