@@ -57,7 +57,7 @@ cb_palette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00"
 
 ```{r}
 #| label: load junction data
-junction_df <- read_csv("docs/Junction.csv", show_col_types = FALSE)
+junction_df <- read_csv("Junction.csv", show_col_types = FALSE)
 
 junction_df |> head()
 ```
@@ -74,7 +74,7 @@ mapview(junction_sf)
 
 ```{r}
 #| label: load battle data
-battle_df <- read_csv("docs/nps_battles.csv", show_col_types = FALSE)
+battle_df <- read_csv("nps_battles.csv", show_col_types = FALSE)
 battle_df <- battle_df %>% 
   mutate(
     significance_numeric = case_when(
@@ -276,7 +276,7 @@ plot(confed_ppp)
 ```
 
 ```{r}
-#| label: low medium high
+
 obs_confed_counts <- quadratcount(confed_ppp, tess=junction_areas) |> as.vector() 
 names(obs_confed_counts) <- region_labels
 obs_confed_counts
@@ -286,7 +286,6 @@ obs_confed_counts
 Monte Carlo pipeline
 
 ```{r}
-#| label: simulating ppp
 set.seed(1007)
 gen_sim_ppp <- function() {
   confed_sim <- spatstat.random::rpoint( n = nrow(confed_sf),
@@ -309,7 +308,6 @@ compute_quadrat_counts(sim_confed_ppp)
 ```
 
 ```{r}
-#| label: monte carlo sims
 set.seed(1007)
 gen_sims_ppp <- function(num_sims) {
   confed_sims <- spatstat.random::rpoint( n = nrow(confed_sf),
@@ -332,7 +330,6 @@ full_count_df |> head()
 Test statistic
 
 ```{r}
-#| label: test statistic
 mc_df <- bind_rows(full_count_df, obs_confed_counts)
 
 full_count_df |> ggplot(aes(x=High)) +
