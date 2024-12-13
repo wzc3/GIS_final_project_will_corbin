@@ -23,13 +23,13 @@ prefer-html: true
 The US Civil War was one of the first wars that attempted to leverage the use of railroads. Controlling railroad locations and having easy access contributed to the Union's ability to win the war, especially because most battles took place in the US South. Railroads are able to be utilized to transport troops and supplies, and by doing so provide crucial support for an army that is not on its home soil.
 
 The question I would like to explore:
-Is the Union more likely to win battles that are located in close proximity to railroad junctions?
+**Is the Union more likely to win battles that are located in close proximity to railroad junctions?**
 
 Null hypothesis:
-The likelihood that an Union victory occurs at the given point s_i is directly proportional to the density of railroad junctions at that point.
+The likelihood that an Union victory occurs at the given point _s~i~_ is directly proportional to the density of railroad junctions at that point.
 
 Alternative hypothesis:
-There exists a population density threshold p* such that Union victories occur at locations s_i* with railroad junction density greater than p* more often than what would be expected solely on the basis of this railroad junction density.
+There exists a population density threshold _p^*_ such that Union victories occur at locations _s~i~^*_ with railroad junction density greater than _p^*_ more often than what would be expected solely on the basis of this railroad junction density.
 
 ## Broad Roadmap
 
