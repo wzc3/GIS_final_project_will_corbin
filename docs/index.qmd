@@ -20,28 +20,67 @@ prefer-html: true
 
 ## Introduction
 
-The US Civil War was one of the first wars that attempted to leverage the use of railroads. Controlling railroad locations and having easy access contributed to the Union's ability to win the war, especially because most battles took place in the US South. Railroads are able to be utilized to transport troops and supplies, and by doing so provide crucial support for an army that is not on its home soil.
+The US Civil War was one of the first wars that attempted to leverage the use of railroads. 
+Controlling access to resources has always been an important aspect of war, and controlling 
+railroad junctions contributed to the Union’s victory. Railroads can transport troops and supplies, 
+and by doing so provide crucial support for an army that is not on its home soil. 
+Most battles took place in the US South, so the Union armies had to travel greater distances, 
+making efficient railroad utilization that much more important. 
 
-The question I would like to explore:
-**Is the Union more likely to win battles that are located in close proximity to railroad junctions?**
+The Union Army was able to gain key advantages in the war due to their superior understanding 
+of the importance of railroads than the Confederate Army. Railroads under Confederate control 
+tended to have maintenance issues, poor connections, and in general were in much worse condition 
+than the railroads under Union control. Union generals such as William Tecumseh Sherman were 
+excellent in understanding how a success or failure depended on fresh supplies and soldiers 
+delivered directly to the battlefield. They intentionally targeted junctions in hub areas 
+such as Chattanoga, Atlanta, and Corinth.
 
-Null hypothesis:
-The likelihood that an Union victory occurs at the given point _s~i~_ is directly proportional to the density of railroad junctions at that point.
+Check out these links for more reading:
+- [Railroads and the Confederacy](https://www.battlefields.org/learn/articles/railroads-confederacy)
+- [How the Railroads Won the War](https://americanexperience.si.edu/wp-content/uploads/2015/02/How-the-Railroad-Won-the-War.pdf)
 
-Alternative hypothesis:
-There exists a population density threshold _p^*_ such that Union victories occur at locations _s~i~^*_ with railroad junction density greater than _p^*_ more often than what would be expected solely on the basis of this railroad junction density.
+I wanted to rigorously test how much the Union was able to successfully leverage the use of railroads, 
+particularly in the greater US South, as that was when it was most necessary, as the Union was away from the home territory in the North. 
+
+The main question I would like to explore:
+
+**In the broader US South, is the Union more likely to win battles that are located in close proximity to railroad junctions than battles that are far from railroad junctions?**
+
+My initial hypothesis would be:
+
+**Out of battles that the Union won in the US South, they were more likely to be in denser areas of railroad junctions.**
+
+Or, stated more rigorously:
+
+**Null hypothesis:**
+The likelihood that an Union victory in the US South occurs at the given point *s~i~* is directly proportional to the density of railroad junctions at that point.
+
+**Alternative hypothesis:**
+There exists a railroad junction density threshold *j^\*^* such that Union victories in the US South occur at locations *s~i~^\*^* with railroad junction density greater than *j^\*^* more often than what would be expected solely on the basis of this railroad junction density.
 
 ## Broad Roadmap
 
 - Determine where the railroad junctions are located (specifically in the US South). 
 - Determine where Civil War battles took place.
-- Analyze distances from battle sites to railroad junctions.
 - Compare intensity functions of railroad junctions and battle sites.
 - Run an experiment that randomizes some element of battle sites location or railroad junction locations.
 - Examine possible spatial effect of railroad junctions on the results of battles, specifically battles that resulted in an Union victory.
-- Is there anything we can test regarding the significance of the battle?
 
 ## Exploratory Data Analysis (EDA)
+
+Data on railroad junctions came from a digital history project called [Railroads and the Making of Modern America](https://railroads.unl.edu/resources/).
+I used data from 1860, which would be right before the wat started, and I looked at railroads in the US South, specifically focusing on junctions than connections,
+which would be the larger hubs that are more popular to focus on controlling. The data was in Google Earth format, so pre-code, I 
+used an online tool that allowed me to convert the locations of these railroad junctions into a dataset of longitudes and latitudes.
+
+Data on all of the Civil War battles came from the [National Park Service Reports](https://acw-battle-data.readthedocs.io/en/latest/resources/nps_battles.html).
+Key information that I utilized from here included result , longitude, latitude, and significance rating of the battle.
+
+Here I import all of the R packages that I will be using.
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
 
 ```{r}
 #| label: imports
@@ -52,8 +91,10 @@ library(units) |> suppressPackageStartupMessages()
 library(concaveman) |> suppressPackageStartupMessages()
 library(dplyr) |> suppressPackageStartupMessages()
 library(spatstat) |> suppressPackageStartupMessages()
-cb_palette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cb_palette <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666")
 ```
+
+Next I will load in and visualize the datasets, starting with the railroad junctions.
 
 ```{r}
 #| label: load junction data
@@ -72,6 +113,13 @@ mapview(junction_sf)
 
 ```
 
+
+The battle data is visualized below. 
+I removed battle data to make it only that the US South is considered, because our railroad data is only US South.
+The first plot is assuming that all battles have the same significance. 
+The second plot shows the battles with weights based on their significance. I converted a string significance rating to a numeric one for plotting purposes.
+
+
 ```{r}
 #| label: load battle data
 battle_df <- read_csv("nps_battles.csv", show_col_types = FALSE)
@@ -82,8 +130,19 @@ battle_df <- battle_df %>%
       significance == 'B' ~ 3,
       significance == 'C' ~ 2,
       significance == 'D' ~ 1
-    )
-  )
+    )) %>%
+  filter(
+    state != "MN" 
+  )  %>%
+  filter(
+    state != "ND" 
+  )   %>%
+  filter(
+    state != "ID" 
+  )   %>%
+  filter(
+    state != "NM" 
+  )    
 
 battle_df |> head()
 
@@ -111,32 +170,27 @@ mapview(battle_sf_significance,zcol="result", cex="significance_numeric", label=
 
 ## Hypothesis Testing
 
-Let's generate a sample that randomly assigns the outcome of the battle.
+### Union-won Battles and Proximity to Railroad Junctions
+
+If you recall, I am exploring the question of whether, out of battles that the Union won, they were more likely to be in denser areas of railroad junctions.
+
+To start, we will construct our observation window of the battle locations. 
+This symbolizes the land mass that contains all of the Civil War battle locations. 
+We are setting a border around the points we have, essentially removing wasted space from the US map.
 
 ```{r}
-#| label: sample of battles with random result
-battle_sf_sample <- battle_df |> sf::st_as_sf( coords=c("long","lat"), crs=4326
-) |> sf::st_transform(3857)
-N <- 300
-battle_sf_sample <- battle_sf_sample |> sample_n(N) |> 
-  mutate(label = paste0("Result: ",result))
-mapview(battle_sf_sample,zcol="result", label="result")
-```
-
-Making a hull for the junctions.
-
-```{r}
-#| label: hull for junctions
+#| label: hull for battles
 hull_sf <- battle_sf |>
   concaveman::concaveman(concavity=3) |>
-  sf::st_buffer(dist=5)
+  sf::st_buffer(dist=100)
 plot(hull_sf)
 ```
 
-Making a ppp object for the junctions.
+Next, we are adding points to our observation window via an unmarked ppp object.
+We are starting with the junctions, then we will add the battles in a separate object.
 
 ```{r}
-#| label: unmarked ppp object for junction
+#| label: unmarked ppp object for junctions
 junction_sfc <- junction_sf |> sf::st_as_sfc()
 junction_ppp <- as.ppp(junction_sfc, W=as.owin(hull_sf))
 ```
@@ -157,7 +211,7 @@ plot(battle_ppp)
 
 ```
 
-Intensity functions
+From here, we want to compare estimated intensity functions of the junction and battle objects.
 
 ```{r}
 #| label: junction intensity
@@ -171,12 +225,13 @@ battle_int <- density(battle_ppp)
 plot(battle_int)
 ```
 
-Observed quadrant counts
+The battle ppp objects and intensity functions tend to match up pretty well with the distribution of the junction objects.
+However, battles seem to be more spread out than railroad junctions, but also much more dense in the northeast are of the object.
 
-
+Next, we will observe the areas on the junction map that are considered to be high, medium, and low densities.
 
 ```{r}
-#| label: Union victories by junction density
+#| label: junction density
 num_regions <- 3
 region_labels <- c("Low", "Medium", "High")
 junction_vals <- junction_int
@@ -185,6 +240,10 @@ junction_cut <- cut(junction_vals, breaks=junction_quant, labels=region_labels)
 junction_areas <- tess(image=junction_cut)
 plot(junction_areas)
 ```
+
+I filtered the battle data to only include battles that were Union victories.
+I created a Union ppp object that displays this filtering.
+We will then observe the counts of these Union-won battles that occurred in areas of high, medium, and low railroad junction density.
 
 ```{r}
 #| label: observed quadrant counts for union won battles
@@ -202,7 +261,11 @@ obs_union_counts
 
 ```
 
-Monte Carlo pipeline
+Our counts of the observed areas are shown above. 
+Most Union-won battles occur in the areas that are in the "high" category of railroad junction density.
+
+Now, we will begin the Monte Carlo simulation pipeline.
+I will start by creating an initial simulated ppp object of union victories. 
 
 ```{r}
 #| label: simulating ppp
@@ -218,6 +281,8 @@ plot(sim_union_ppp)
 
 ```
 
+The counts of the simulated Union victories and their viewed density regions are shown below.
+
 ```{r}
 compute_quadrat_counts <- function(sim_ppp) {
   sim_counts <- quadratcount(sim_ppp, tess=junction_areas) |> as.vector() 
@@ -226,6 +291,8 @@ compute_quadrat_counts <- function(sim_ppp) {
 } 
 compute_quadrat_counts(sim_union_ppp)
 ```
+
+Now, we will conduct 999 simulations of what we just did!
 
 ```{r}
 #| label: monte carlo sims
@@ -243,12 +310,14 @@ full_count_df <- as_tibble(full_sim_area_counts) |> t() |> as_tibble()
 
 ```
 
+The results of the simulation are displayed in the table below.
+
 ```{r}
 colnames(full_count_df) <- region_labels 
 full_count_df |> head()
 ```
 
-Test statistic
+Now I will calculate and plot the test statistic of the simulations.
 
 ```{r}
 #| label: test statistic
@@ -265,7 +334,12 @@ p_value <- nrow(p_value_df) / nrow(mc_df)
 p_value
 ```
 
+The resulting p-value is very small. More on this later.
+
 ### What about Confederate victories?
+
+I ran the same simulations for Confederate victories in the South, just to see how it might differ from the Union victories.
+This is the same exact simulation process, just with Confederte victories substitude for Union ones.
 
 ```{r}
 #| label: observed quadrant counts for confederate won battles
@@ -283,7 +357,7 @@ obs_confed_counts
 
 ```
 
-Monte Carlo pipeline
+Monte Carlo pipeline.
 
 ```{r}
 set.seed(1007)
@@ -327,7 +401,7 @@ colnames(full_count_df) <- region_labels
 full_count_df |> head()
 ```
 
-Test statistic
+Test statistic.
 
 ```{r}
 mc_df <- bind_rows(full_count_df, obs_confed_counts)
@@ -337,6 +411,7 @@ full_count_df |> ggplot(aes(x=High)) +
   geom_vline(xintercept = obs_confed_counts["High"], linetype="dashed", color=cb_palette[1])
 ```
 
+P-value. 
 ```{r}
 p_value_df <- mc_df[mc_df$High <= obs_confed_counts["High"],] 
 p_value <- nrow(p_value_df) / nrow(mc_df) 
@@ -348,5 +423,15 @@ p_value
 ## Discussion
 
 
-## Conclusion
+## Future Exploration
 
+One interesting byproduct of a war that leveraged railroads was that for the first time, 
+many battle sites were able to be far away from highly populated areas, i.e. more true battlefields 
+instead of walking or riding distance from home. It would be interesting to take census data from this time period, 
+figure out where the densely populated areas were, and compare that to the battle locations.
+
+Since both Union victories and Confederate victories were more likely to be closer to railroads, 
+it kind of means that battles in general were closer to railroads. I can further explore what 
+traits were unique to each side coming out victorious, maybe there are confounding variables present.
+
+## Conclusion
