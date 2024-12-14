@@ -424,9 +424,56 @@ p_value
 From a numbers perspective, the p-value from the simulation that was entirely Union victories was 0.001. 
 The p-value for the simulation of Confederate victories was 0.048. 
 
-For Union victories, since none of our 999 simulations 
+But this was in the other direction!!! 
+So in reality, these p-values would be 0.999 and 0.952.
 
+This means that in all 999 of our simulations, we saw more counts of Union victories in high density zones than we observed in reality.
+So I therefore do not have confidence in my alternative hypothesis. There is seemingly no threshold that causes Union victories to occur 
+with greater density than what would be accounted for from our given railroad density. 
 
+We actually observe the opposite phenomenon. Simulating under the null hypothesis of given railroad densities, we see a greater proportion of Union victories occuring 
+in regions of medium or low railroad density than we would see in our simulations.
+
+One possible explanation of this could be that it was harder for the Union to outright control total areas of 
+high railroad junction density. These could be the areas where the Confederates were also able to leverage railroads, 
+if not simply because there were more, and more ways to get supplies and troops towards the battlefields.
+
+When taking a look at the simulation ran for the Confederate battle victories, we see some indication towards the point 
+made in the previous paragraph. Althought the p-value is not very strong, it is 48 times stronger than the p-value for the Union armies. 
+This means that we had simulations where Confederate victories occurred in high density areas even above what we would've expected to see under the basis 
+of the railroad junction densities of the region.
+
+So, this could mean that Confederates actually count on the regions of high density of railroads. 
+Knowing the background knowledge that Union generals were more adept to exploting the benefits of controlling railroads, 
+it would make sense that the Union won more battles where railroads were more scarce. If they could control the railroads 
+in these less dense regions, then the Confederates would have a hard time winning battles in these sites.
+
+## Post-Discussion Adjustment
+
+```{r}
+
+mc_df <- bind_rows(full_count_df, obs_union_counts)
+
+full_count_df |> ggplot(aes(x=Low)) +
+  geom_density(fill=cb_palette[2], alpha=0.5) + 
+  geom_vline(xintercept = obs_union_counts["Low"], linetype="dashed", color=cb_palette[1])
+```
+
+```{r}
+p_value_df <- mc_df[mc_df$High >= obs_confed_counts["Low"],] 
+p_value <- nrow(p_value_df) / nrow(mc_df) 
+p_value
+```
+
+This new graph is the observed Union victories in areas of low railroad junction densities 
+versus what we saw in our 999 simulations. 
+
+The results of the plot and p-value lend itself to our new theory that we posed in the discussion section.
+This theory is that the Union actually won battles in areas of low railroad density more than what would be expected 
+under normal null hypothesis conditions. 
+
+I have more confidence in this theory, as logic backs it up. If the Union leveraged railroads better than the Confederates, and they 
+were able to control railroad junctions in areas where there are very few junctions, then it would create an advantage for the Union.
 
 ## Future Exploration
 
@@ -446,5 +493,15 @@ Railroads were clearly important to the war in general, but I decided to look in
 specifically when it came to battles in the US South, as those would be the battles where leveraging railroads would be 
 the most important.
 
+My initial hypothesis that the Union would disproportionately win battles in areas of high railroad density proved to be very unlikely to be correct. 
+What I ended up determining to be plausible was almost the opposite theory. The Union actually won disproportionately more battles 
+in areas where the railroad density was low, likely because controlling junctions in these low density regions would be more impactful to the result of the battle 
+than controlling only some of the junctions in an area where there are lots of railroad options. 
+
+Overall, this was a fun application of GIS principles in a historical setting. I like the idea of being able to do data analysis of time periods 
+where people weren't necessarily going about tracking all sorts of data with the intention of data analysis. I love the intersection of data science 
+with humanities fields, and this project was an enjoyable use of techniques I learned this semester to a unique idea. 
+
+Thank you for reading!
 
 
