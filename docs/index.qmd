@@ -412,15 +412,20 @@ full_count_df |> ggplot(aes(x=High)) +
 ```
 
 P-value. 
+
 ```{r}
 p_value_df <- mc_df[mc_df$High <= obs_confed_counts["High"],] 
 p_value <- nrow(p_value_df) / nrow(mc_df) 
 p_value
 ```
 
-
-
 ## Discussion
+
+From a numbers perspective, the p-value from the simulation that was entirely Union victories was 0.001. 
+The p-value for the simulation of Confederate victories was 0.048. 
+
+For Union victories, since none of our 999 simulations 
+
 
 
 ## Future Exploration
@@ -435,3 +440,11 @@ it kind of means that battles in general were closer to railroads. I can further
 traits were unique to each side coming out victorious, maybe there are confounding variables present.
 
 ## Conclusion
+
+I wanted to explore how the Union army leveraged railroads in order to help them win the Civil War. 
+Railroads were clearly important to the war in general, but I decided to look into the benefits it gave to the Union, 
+specifically when it came to battles in the US South, as those would be the battles where leveraging railroads would be 
+the most important.
+
+
+
